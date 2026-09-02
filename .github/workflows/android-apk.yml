@@ -3,15 +3,14 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: 'Release tag to attach the APK to; leave empty to use the latest release'
+        description: Release tag to attach the APK to
         required: false
-        default: ''
+        default: Physics
   push:
     branches: [main]
     tags: ['*']
   release:
     types: [published]
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,17 +20,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.release.tag_name || github.ref }}
-      - name: Set up JDK
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-      - name: Install Android SDK packages
-        run: sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+      - uses: android-actions/setup-android@v3
+      - run: sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+      - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.10'
       - name: Build release APK
@@ -42,22 +37,19 @@ jobs:
         with:
           name: vector-lab-android
           path: android/app/build/outputs/apk/release/app-release.apk
-      - name: Resolve release tag
+          if-no-files-found: error
+      - name: Resolve release
         id: release
-        if: inputs.release_tag != '' || github.event_name == 'release' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) || github.event_name == 'push'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG='${{ inputs.release_tag }}'
-          if [ -z "$TAG" ]; then TAG='${{ github.event.release.tag_name }}'; fi
-          if [ -z "$TAG" ] && [[ '${{ github.ref }}' == refs/tags/* ]]; then TAG='${{ github.ref_name }}'; fi
+          TAG="${{ inputs.release_tag }}"
+          if [ -z "$TAG" ]; then TAG="${{ github.event.release.tag_name }}"; fi
+          if [ -z "$TAG" ] && [[ "${{ github.ref }}" == refs/tags/* ]]; then TAG="${{ github.ref_name }}"; fi
           if [ -z "$TAG" ]; then TAG="$(gh release list --limit 1 --json tagName --jq '.[0].tagName')"; fi
-          if [ -z "$TAG" ]; then echo 'No GitHub release exists yet; APK remains available as a workflow artifact.'; exit 0; fi
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-      - name: Attach APK to GitHub Release
+      - name: Upload APK to release
         if: steps.release.outputs.tag != ''
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.release.outputs.tag }}
-          files: android/app/build/outputs/apk/release/app-release.apk
-          generate_release_notes: false
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ steps.release.outputs.tag }}" android/app/build/outputs/apk/release/app-release.apk --repo "${{ github.repository }}" --clobber
