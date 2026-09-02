@@ -1,0 +1,2 @@
+import type {MetadataRoute} from 'next'
+export default function sitemap():MetadataRoute.Sitemap{return[{url:'https://vector-lab-himeshbror-5266s-projects.vercel.app',lastModified:new Date(),changeFrequency:'weekly',priority:1}]}
