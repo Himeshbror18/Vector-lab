@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Next.js
+.next/
+out/
+
+# Local env files
+.env*
+!.env.example
+
+# Vercel
+.vercel/
+
+# Android / Gradle
+android/.gradle/
+android/build/
+android/app/build/
+*.apk
+*.aab
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
