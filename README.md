@@ -42,9 +42,9 @@ Open http://localhost:3000.
 
 ## 🤝 Maintainer
 
-**HB (Himesh Bror)** maintains Vector Lab / IXO.
+**Taiga** maintains Vector Lab / IXO.
 
-GitHub: https://github.com/0xMarrow
+GitHub: https://github.com/TaigaRig
 
 ## 📄 License
 
