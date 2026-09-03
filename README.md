@@ -42,7 +42,9 @@ Open http://localhost:3000.
 
 ## 🤝 Maintainer
 
-Himesh Bror maintains Vector Lab / IXO.
+**HB (Himesh Bror)** maintains Vector Lab / IXO.
+
+GitHub: https://github.com/0xMarrow
 
 ## 📄 License
 
